@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-xl font-bold mb-4">Inputs</h2>
+        <!-- Form for inputs -->
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-xl font-bold mb-4">Alert Simulation</h2>
+        {% include "components/alert_card.html" %}
+    </div>
+</div>
+{% endblock %}
