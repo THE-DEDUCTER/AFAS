@@ -1,1 +1,6 @@
 project_context.md
+data/
+models/
+venv/
+__pycache__/
+*.pyc

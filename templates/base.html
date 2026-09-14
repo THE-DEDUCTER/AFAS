@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AFAS Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="bg-gray-100 text-gray-900">
-    <header class="bg-red-600 text-white p-4 text-center">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <header class="bg-red-600 text-white p-4 flex justify-between items-center">
         <h1 class="text-2xl font-bold">AFAS Dashboard</h1>
+        <button id="theme-toggle" class="bg-red-700 hover:bg-red-800 px-3 py-1 rounded shadow-md text-sm transition-colors">
+            🌙 Dark Mode
+        </button>
     </header>
     <main class="p-4 max-w-4xl mx-auto">
         {% block content %}{% endblock %}

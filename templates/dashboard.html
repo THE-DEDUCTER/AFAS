@@ -1,14 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-xl font-bold mb-4">Inputs</h2>
-        <!-- Form for inputs -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    
+    <!-- Input Section -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg transition-colors duration-200">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 pb-2">Simulation Inputs</h2>
+        
+        <form id="sim-form" class="space-y-6">
+            
+            <!-- Occupant Profile -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Occupant Disability Profile</label>
+                <select id="occupant" name="occupant" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm p-2 border focus:border-red-500 focus:ring-red-500">
+                    <option value="none">None (Standard Alarm)</option>
+                    <option value="deaf">Deaf / Hard of Hearing</option>
+                    <option value="blind">Blind / Visually Impaired</option>
+                    <option value="mobility">Mobility Impaired (Wheelchair)</option>
+                    <option value="cognitive">Cognitive Impairment</option>
+                </select>
+            </div>
+
+            <!-- Live Camera Feed -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Live Camera Feed</label>
+                <div class="relative bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden flex items-center justify-center w-full" style="aspect-ratio: 4/3;">
+                    <video id="webcam" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+                    <div id="webcam-placeholder" class="text-gray-500 dark:text-gray-400 text-sm text-center p-4">
+                        Click "Start Monitoring" to enable webcam.<br>
+                        (Requires camera permissions)
+                    </div>
+                </div>
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+
+            <!-- Sensor Simulation -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Sensor Stream Data</label>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
+                            <span>Temperature (°C)</span>
+                            <span id="temp-val" class="font-bold text-gray-900 dark:text-white">25</span>
+                        </label>
+                        <input type="range" id="temp" min="10" max="100" value="25" class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    
+                    <div>
+                        <label class="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
+                            <span>Smoke/TVOC (ppb)</span>
+                            <span id="tvoc-val" class="font-bold text-gray-900 dark:text-white">100</span>
+                        </label>
+                        <input type="range" id="tvoc" min="0" max="5000" value="100" class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="toggle-monitor" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-md transition duration-200 shadow-md">
+                Start Monitoring
+            </button>
+        </form>
     </div>
-    <div class="bg-white p-4 rounded shadow">
-        <h2 class="text-xl font-bold mb-4">Alert Simulation</h2>
-        {% include "components/alert_card.html" %}
+
+    <!-- Output Section -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col transition-colors duration-200">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 pb-2">Adaptive Alert Delivery</h2>
+        
+        <div class="flex-grow flex items-center justify-center">
+            {% include "components/alert_card.html" %}
+        </div>
+        
+        <div id="logs" class="mt-8 bg-gray-900 text-green-400 p-4 rounded-md h-40 overflow-y-auto text-xs font-mono hidden">
+            <p>Waiting for simulation...</p>
+        </div>
     </div>
+    
 </div>
 {% endblock %}

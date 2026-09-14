@@ -1,3 +1,23 @@
-<div id="alert-card" class="p-4 rounded border-2 border-transparent transition-all duration-300">
-    <p id="alert-message" class="text-lg text-center font-bold">No active alerts</p>
+<div id="alert-card" class="w-full h-64 p-8 rounded-xl border-4 border-gray-200 bg-gray-50 transition-all duration-300 flex flex-col justify-center items-center relative overflow-hidden">
+    
+    <!-- Status Icon -->
+    <div id="status-icon" class="text-6xl mb-4 transition-transform duration-300 z-10">
+        🛡️
+    </div>
+
+    <!-- Alert Message -->
+    <h3 id="alert-message" class="text-2xl font-bold text-gray-700 text-center z-10">System Normal</h3>
+    
+    <!-- Guidance Text -->
+    <p id="alert-guidance" class="text-center text-sm font-semibold text-gray-600 mt-4 px-4 z-10 opacity-0 transition-opacity duration-300"></p>
+    
+    <!-- Badges for active modalities -->
+    <div id="modality-badges" class="absolute bottom-4 flex gap-2 opacity-0 transition-opacity duration-300 z-10">
+        <span id="badge-visual" class="hidden bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">VISUAL STROBE</span>
+        <span id="badge-vibration" class="hidden bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">BED SHAKER</span>
+        <span id="badge-audio" class="hidden bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">AUDIO SIREN</span>
+    </div>
+
+    <!-- Overlay for strobe effect -->
+    <div id="strobe-overlay" class="absolute inset-0 pointer-events-none hidden z-0"></div>
 </div>
