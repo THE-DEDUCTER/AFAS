@@ -7,3 +7,5 @@ pandas
 numpy
 Pillow
 opencv-python
+ultralytics
+huggingface_hub

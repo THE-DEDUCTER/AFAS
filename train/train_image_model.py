@@ -74,7 +74,9 @@ def train_model():
 
             for inputs, labels in dataloader:
                 inputs = inputs.to(device)
-                labels = labels.to(device).float().unsqueeze(1)
+                # ImageFolder maps 'fire_images' -> 0 and 'non_fire_images' -> 1 alphabetically.
+                # Invert so 1.0 represents Fire and 0.0 represents Non-Fire:
+                labels = (labels == 0).float().unsqueeze(1).to(device)
 
                 optimizer.zero_grad()
 

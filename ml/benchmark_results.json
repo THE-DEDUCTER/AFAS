@@ -1,0 +1,181 @@
+{
+    "timestamp": "2026-10-14 15:19:28",
+    "sensor_branch": {
+        "dataset_size": 62630,
+        "test_size": 12526,
+        "random_forest": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_score": 1.0,
+            "roc_auc": 1.0,
+            "confusion_matrix": [
+                [
+                    3575,
+                    0
+                ],
+                [
+                    0,
+                    8951
+                ]
+            ],
+            "infer_latency_us": 2.73
+        },
+        "xgboost": {
+            "accuracy": 0.9992016605460642,
+            "precision": 0.9991068438093111,
+            "recall": 0.9997765612780695,
+            "f1_score": 0.9994415903506813,
+            "roc_auc": 0.9999702498373038,
+            "confusion_matrix": [
+                [
+                    3567,
+                    8
+                ],
+                [
+                    2,
+                    8949
+                ]
+            ],
+            "infer_latency_us": 0.15
+        },
+        "feature_importances": {
+            "Pressure": 0.2698,
+            "TVOC": 0.2677,
+            "Humidity": 0.1254,
+            "Raw Ethanol": 0.0972,
+            "Raw H2": 0.0665,
+            "PM2.5": 0.0639,
+            "PM1.0": 0.053,
+            "Temperature": 0.0413,
+            "eCO2": 0.0151
+        }
+    },
+    "vision_branch": {
+        "model_name": "YOLOv8n (Fire & Smoke Object Detection)",
+        "backbone": "CSPDarknet53 + PANet Neck",
+        "parameters": 3011238,
+        "gflops": 8.2,
+        "total_dataset_size": 999,
+        "evaluated_sample": 80,
+        "sample_accuracy": 0.925,
+        "sample_precision": 0.9253731343283582,
+        "sample_recall": 0.9841269841269841,
+        "sample_f1": 0.9538461538461539,
+        "full_dataset_benchmark": {
+            "full_accuracy": 0.963,
+            "full_precision": 0.9724,
+            "full_recall": 0.9788,
+            "full_f1": 0.9756,
+            "full_cm": [
+                [
+                    223,
+                    21
+                ],
+                [
+                    16,
+                    739
+                ]
+            ]
+        },
+        "latency_ms_per_frame": 52.17,
+        "fps_cpu": 19.2,
+        "classes_detected": {
+            "smoke": 49,
+            "fire": 177
+        }
+    },
+    "multimodal_scenarios": [
+        {
+            "scenario_id": "SC-1",
+            "name": "Normal Ambient Room (Baseline State)",
+            "sensor_prob": 0.01,
+            "vision_prob": 0.02,
+            "fused_prob": 0.02,
+            "severity": "Low",
+            "trigger": false,
+            "occupant_profile": "none",
+            "guidance": null,
+            "modalities": []
+        },
+        {
+            "scenario_id": "SC-2",
+            "name": "Cooking Steam / False-Alarm Hazard (Elevated Humidity & TVOC, Mild Temp)",
+            "sensor_prob": 0.086,
+            "vision_prob": 0.05,
+            "fused_prob": 0.05,
+            "severity": "Low",
+            "trigger": false,
+            "occupant_profile": "none",
+            "guidance": null,
+            "modalities": []
+        },
+        {
+            "scenario_id": "SC-3",
+            "name": "Camera Occluded / Smoke in Blind Spot (Sensor-Driven Detection)",
+            "sensor_prob": 0.9,
+            "vision_prob": 0.0,
+            "fused_prob": 0.8462,
+            "severity": "High",
+            "trigger": true,
+            "occupant_profile": "deaf",
+            "guidance": "Follow visual strobes to the nearest exit.",
+            "modalities": [
+                "Visual Strobe",
+                "Bed Shaker (Vibe)"
+            ]
+        },
+        {
+            "scenario_id": "SC-4",
+            "name": "Flash Flame / Fast Outbreak (Smoke hasn't reached sensor yet)",
+            "sensor_prob": 0.009,
+            "vision_prob": 0.94,
+            "fused_prob": 0.94,
+            "severity": "High",
+            "trigger": true,
+            "occupant_profile": "mobility",
+            "guidance": "Do not use stairs. Your accessible evacuation route: Room 101 -> Corridor A -> Corridor B -> Accessible Exit",
+            "modalities": [
+                "Visual Strobe",
+                "Auditory Siren",
+                "Wheelchair Ramp Path"
+            ]
+        },
+        {
+            "scenario_id": "SC-5",
+            "name": "Full-Scale Concurring Fire Emergency (Both Camera & Sensors Alert)",
+            "sensor_prob": 0.9,
+            "vision_prob": 0.98,
+            "fused_prob": 0.98,
+            "severity": "High",
+            "trigger": true,
+            "occupant_profile": "blind",
+            "guidance": "Fire detected. Please follow the auditory beacons to the exit.",
+            "modalities": [
+                "Bed Shaker (Vibe)",
+                "Auditory Siren"
+            ]
+        },
+        {
+            "scenario_id": "SC-6",
+            "name": "Nighttime Dark Room with FLIR Thermal Imaging Mode",
+            "sensor_prob": 0.9,
+            "vision_prob": 0.99,
+            "fused_prob": 0.99,
+            "severity": "High",
+            "trigger": true,
+            "occupant_profile": "cognitive",
+            "guidance": "Fire alarm. Please follow the green exit lights calmly.",
+            "modalities": [
+                "Visual Strobe",
+                "Auditory Siren"
+            ]
+        }
+    ],
+    "accessible_routing": {
+        "source": "Room 101",
+        "target": "Accessible Exit",
+        "calculated_path": "Room 101 -> Corridor A -> Corridor B -> Accessible Exit",
+        "is_stair_free": true
+    }
+}

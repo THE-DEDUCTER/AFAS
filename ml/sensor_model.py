@@ -49,6 +49,17 @@ def predict_sensor(sensor_data: dict) -> float:
         
         # Predict probability of class 1 (Fire)
         prob = model.predict_proba(scaled_data)[0][1]
+        
+        # Suppress false positives for unusual/low temperatures
+        # If Temp is < 35C (room temp), a fire is unlikely unless smoke (TVOC) is VERY high.
+        temp = float(sensor_data.get('Temperature', 20.0))
+        tvoc = float(sensor_data.get('TVOC', 0.0))
+        
+        if temp < 35.0 and tvoc < 1500.0:
+            prob = float(prob) * 0.1
+        elif temp > 50.0 or tvoc > 2000.0:
+            prob = max(prob, 0.9)
+            
         return float(prob)
     except Exception as e:
         print(f"Error predicting sensor: {e}")

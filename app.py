@@ -21,13 +21,20 @@ def predict():
         sensor_data_str = request.form.get('sensor_data', '{}')
         sensor_data = json.loads(sensor_data_str)
         
+        # Get thermal mode flag
+        thermal_mode = request.form.get('thermal_mode') == 'true'
+        
         # Get Image if provided
         image_file = request.files.get('image')
         
         img_prob = None
         if image_file and image_file.filename != '':
             image_bytes = image_file.read()
-            img_prob = predict_image(image_bytes)
+            if thermal_mode:
+                from ml.image_model import predict_thermal
+                img_prob = predict_thermal(image_bytes)
+            else:
+                img_prob = predict_image(image_bytes)
             
         sensor_prob = None
         if sensor_data:
@@ -37,7 +44,7 @@ def predict():
             return jsonify({"error": "No data provided"}), 400
             
         # Fusion
-        fusion_result = fuse_predictions(img_prob, sensor_prob)
+        fusion_result = fuse_predictions(img_prob, sensor_prob, thermal_mode=thermal_mode)
         
         # Alert mapping
         alert_payload = get_alert_payload(

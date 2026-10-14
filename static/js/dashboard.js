@@ -38,6 +38,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Thermal Mode Toggle
+    const thermalToggle = document.getElementById("thermal-toggle");
+    let isThermalMode = false;
+
+    if (thermalToggle) {
+        thermalToggle.addEventListener("change", (e) => {
+            isThermalMode = e.target.checked;
+            if (isThermalMode) {
+                // Fake thermal vision (Ironbow-style: dark is red/purple, bright is yellow/white)
+                webcam.style.filter = "grayscale(1) sepia(1) hue-rotate(330deg) saturate(5) contrast(2)";
+            } else {
+                webcam.style.filter = "none";
+            }
+        });
+    }
+
     // Update slider values on drag
     tempSlider.addEventListener("input", (e) => tempVal.textContent = e.target.value);
     tvocSlider.addEventListener("input", (e) => tvocVal.textContent = e.target.value);
@@ -77,11 +93,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const formData = new FormData();
         formData.append("occupant_profile", occupant);
         formData.append("sensor_data", JSON.stringify(sensorData));
+        formData.append("thermal_mode", isThermalMode);
 
-        // Capture frame from video
+        // Capture frame from video. Downscale to 640x480 to prevent MemoryError while keeping YOLOv8 accurate
         if (webcam.videoWidth > 0) {
-            canvas.width = webcam.videoWidth;
-            canvas.height = webcam.videoHeight;
+            canvas.width = 640;
+            canvas.height = 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
             

@@ -1,23 +1,21 @@
-def fuse_predictions(img_prob: float, sensor_prob: float) -> dict:
-    """
-    Fuses probabilities and makes a final decision.
-    img_prob: float (0 to 1) or None (if no image)
-    sensor_prob: float (0 to 1) or None (if no sensor data)
-    """
+def fuse_predictions(img_prob: float = None, sensor_prob: float = None, thermal_mode: bool = False) -> dict:
+    """Fuses predictions to decide if there is a fire and what the severity is."""
+    final_prob = 0.0
+    
     if img_prob is not None and sensor_prob is not None:
         # Calibrate sensor_prob to remove the ~0.35 baseline of normal rooms
         calibrated_sensor = max(0.0, (sensor_prob - 0.35) / 0.65)
         
-        # STRICT MULTI-MODAL FUSION:
-        # Due to lack of indoor training data, the camera cannot be trusted to trigger 
-        # an alarm entirely on its own (max contribution is 0.4). It requires at least 
-        # some corroboration from the physical sensors (Temp/TVOC) to cross the 0.5 threshold.
-        final_prob = (img_prob * 0.4) + (calibrated_sensor * 0.6)
+        # We take the maximum of the two probabilities. This acts as an "OR" gate:
+        # If either the camera OR the sensors are highly confident, the alarm triggers.
+        # This prevents a 'blind' camera from watering down a spiked temperature sensor,
+        # and vice-versa.
+        final_prob = max(img_prob, calibrated_sensor)
     elif img_prob is not None:
         final_prob = img_prob
     elif sensor_prob is not None:
-        calibrated_sensor = max(0.0, (sensor_prob - 0.35) / 0.65)
-        final_prob = calibrated_sensor
+        # If camera is unavailable, trust the sensor model directly
+        final_prob = sensor_prob
     else:
         final_prob = 0.0
 
