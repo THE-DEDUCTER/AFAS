@@ -247,6 +247,23 @@ def run_vision_benchmarks(sample_limit=250):
     print(f"  Predicted Safe :     TN = 223           FN = 16")
     print(f"  Predicted Fire :     FP = 21            TP = 739")
 
+    # Load expanded benchmark if available
+    exp_file = os.path.join(BASE_DIR, 'ml', 'expanded_vision_results.json')
+    if os.path.exists(exp_file):
+        with open(exp_file) as f:
+            exp_data = json.load(f)
+        m = exp_data['metrics']
+        cm_exp = m['confusion_matrix']
+        results['expanded_benchmark'] = exp_data
+        print("\n" + "-" * 58)
+        print(f"[Expanded Multi-Condition Stress Benchmark (N = {exp_data['total_evaluated']:,})]")
+        print(f"  • Overall Stress Accuracy : {m['accuracy']*100:.2f}%")
+        print(f"  • Robust Precision        : {m['precision']*100:.2f}%")
+        print(f"  • Robust Recall           : {m['recall']*100:.2f}% (Catches {cm_exp['tp']:,} fires)")
+        print(f"  • F1-Score                : {m['f1_score']*100:.2f}%")
+        print(f"  • Matrix [[TN, FP], [FN, TP]]: [[{cm_exp['tn']}, {cm_exp['fp']}], [{cm_exp['fn']}, {cm_exp['tp']}]]")
+        print("  • Conditions Tested: Dense Smoke, Night/Low-Light, Alarm Motion Blur, Sunset Distractors")
+
     return results
 
 def run_multimodal_scenarios():

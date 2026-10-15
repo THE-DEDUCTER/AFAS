@@ -175,14 +175,15 @@ Then open **http://localhost:5000** in your browser.
 
 | Model | Task & Architecture | Accuracy | Precision | Recall | F1-Score | Latency |
 |---|---|---|---|---|---|---|
-| **Vision — YOLOv8n** *(Deployed)* | Object Detection (Flame & Smoke) | **96.30%** | **97.24%** | **97.88%** | **97.56%** | $40.5\text{ ms}$ (24.7 FPS) |
+| **Vision — YOLOv8n (Expanded)** | Multi-Condition Stress Test ($N=2,249$) | **95.29%** | **96.29%** | **96.91%** | **96.60%** | $68.6\text{ ms}$ (14.6 FPS) |
+| **Vision — YOLOv8n (Clean)** | Clean Benchmark ($N=999$) | **96.30%** | **97.24%** | **97.88%** | **97.56%** | $40.5\text{ ms}$ (24.7 FPS) |
 | **Vision — MobileNetV2** *(Baseline)* | Binary Classification (CNN) | **98.40%** | **98.81%** | **98.81%** | **98.81%** | $39.2\text{ ms}$ (25.5 FPS) |
 | **Sensor — Random Forest** *(Deployed)* | 9-Channel IoT Smoke Classification | **100.00%** | **100.00%** | **100.00%** | **100.00%** | $20.4\ \mu\text{s}$ |
 | **Sensor — XGBoost** *(Baseline)* | Gradient Boosted Trees | **99.92%** | **99.91%** | **99.98%** | **99.94%** | $1.86\ \mu\text{s}$ |
 | **Fused Pipeline (Vision + Sensors)** | Calibrated Asymmetric OR-Gating | **99.9%** | **High** | **100.0%** | **Optimal** | $< 45\text{ ms}$ End-to-End |
 
 > 📑 **Full Technical Documentation & Parameter Breakdown:**  
-> See the dedicated [MODEL_SHOWCASE_AND_RESULTS.md](MODEL_SHOWCASE_AND_RESULTS.md) for hyperparameter specifications, confusion matrices, edge-case scenarios, and academic viva Q&A. Run `python ml/showcase_results.py` to regenerate all benchmarks.
+> See the dedicated [MODEL_SHOWCASE_AND_RESULTS.md](MODEL_SHOWCASE_AND_RESULTS.md) for hyperparameter specifications, confusion matrices, environmental stress breakdown, edge-case scenarios, and academic viva Q&A. Run `python ml/showcase_results.py` or `python ml/evaluate_expanded_vision.py` to regenerate all benchmarks.
 
 ---
 

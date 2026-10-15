@@ -202,7 +202,11 @@ P_{sensor} & \text{if only sensors active} \\
 
 ---
 
-## 5. Comprehensive Empirical Results
+## 5. Comprehensive Empirical Results & Visual Analytics
+
+> 📘 **Looking for complete mathematical proofs, neural derivations, and viva defense answers?**  
+> Read the dedicated 400+ line [AI_MODEL_DEEP_DIVE_MANUAL.md](AI_MODEL_DEEP_DIVE_MANUAL.md).  
+> Regenerate all charts anytime via `python ml/generate_visualizations.py`.
 
 All evaluations below were produced directly on the local project datasets using `ml/showcase_results.py`.
 
@@ -218,13 +222,22 @@ Evaluated on a 20% stratified hold-out test set ($N_{test} = 12,526$):
 | **Area Under ROC (AUC)** | **1.0000** | **1.0000** | Tie |
 | **Inference Latency** | **$20.41\ \mu\text{s}$ / sample** | **$1.86\ \mu\text{s}$ / sample** | Both ultra-fast ($< 1\text{ ms}$) |
 
+#### Visual Analytics: Sensor Feature Importance Ranking & ROC Curves
+![Sensor Feature Importances](static/charts/sensor_feature_importances.png)
+*Figure 1: Gini Impurity feature importance distribution across 9 continuous telemetry channels.*
+
+![ROC Curves Comparison](static/charts/roc_curves_comparison.png)
+*Figure 2: Receiver Operating Characteristic (ROC) curve showing AUC = 1.0000 for Random Forest & XGBoost.*
+
 #### Confusion Matrix (Random Forest, $N_{test} = 12,526$)
 $$\begin{pmatrix} \text{True Negatives (TN)} = 3,575 & \text{False Positives (FP)} = 0 \\ \text{False Negatives (FN)} = 0 & \text{True Positives (TP)} = 8,951 \end{pmatrix}$$
 
 ---
 
-### 5.2 Vision Branch Results (FIRE Dataset, $N = 999$)
-Full exhaustive evaluation across all 999 benchmark images:
+### 5.2 Vision Branch Results
+
+#### 5.2.1 Primary Baseline Evaluation (Clean Dataset, $N = 999$)
+Exhaustive evaluation across all 999 benchmark images:
 
 | Evaluation Metric | YOLOv8n (Current) | MobileNetV2 (Baseline) | Performance Difference |
 |---|---|---|---|
@@ -236,13 +249,52 @@ Full exhaustive evaluation across all 999 benchmark images:
 | **Smoke Detection Capability** | **Yes** (610 smoke plumes found) | **No** (Trained on flame only) | **YOLOv8n gives critical early warning** |
 | **Frame Latency (CPU)** | **$40.55\text{ ms}$** ($\approx 24.7\text{ FPS}$) | **$39.23\text{ ms}$** ($\approx 25.5\text{ FPS}$) | Both achieve real-time video speeds |
 
-#### Confusion Matrix (YOLOv8n on Full Dataset, $N = 999$)
-| | Actual Non-Fire ($N=244$) | Actual Fire ($N=755$) |
-|---|---|---|
-| **Predicted Safe** | $\text{TN} = 223$ | $\text{FN} = 16$ |
-| **Predicted Fire** | $\text{FP} = 21$ | $\text{TP} = 739$ |
+*Confusion Matrix (Clean Dataset, $N = 999$):*
+* $\text{TN} = 223$, $\text{FP} = 21$, $\text{FN} = 16$, $\text{TP} = 739$.
 
-*Total Detections Logged:* **2,118 Flame instances**, **610 Smoke plume instances**.
+---
+
+#### 5.2.2 Expanded Multi-Condition Stress Test Benchmark ($N = 2,249$ Images)
+To test robustness under harsh, realistic fire and building conditions, the evaluation corpus was expanded by **$1,250$ additional augmented stress tests** and hard-negative challenges:
+* **Low-Light / Night Power Failure Fire Scenes ($N = 300$)**
+* **Dense Smoke Haze & Contrast Attenuation ($N = 300$)**
+* **Alarm Vibration, Motion Blur & Sensor Noise ($N = 200$)**
+* **Hard Negative Challenge Set ($N = 450$):** Sunset golden-hour warmth, tungsten indoor lighting, dark non-fire rooms, steam/fog clouds.
+
+| Overall Metric | Expanded Benchmark ($N = 2,249$) | Robustness Analysis |
+|---|---|---|
+| **Overall Accuracy** | **95.29%** (2,143 / 2,249) | Retains $> 95\%$ accuracy across severe environmental degradation |
+| **Precision** | **96.29%** | Robust false-positive resistance against sunset/steam distractors |
+| **Recall (Sensitivity)** | **96.91%** (1,507 / 1,555 fires caught) | Catches nearly $97\%$ of fires even in smoke/darkness |
+| **F1-Score** | **96.60%** | Exceptional balanced performance on heavy class imbalance |
+| **Inference Latency** | **$68.61\text{ ms}$** ($\approx 14.6\text{ FPS}$) | Real-time edge processing maintained |
+
+#### Full Confusion Matrix (Expanded Benchmark, $N = 2,249$)
+| | Actual Safe ($N = 694$) | Actual Fire ($N = 1,555$) |
+|---|---|---|
+| **Predicted Safe** | $\text{TN} = 636$ | $\text{FN} = 48$ |
+| **Predicted Fire** | $\text{FP} = 58$ | $\text{TP} = 1,507$ |
+
+#### Environmental Condition & Stress Sub-Category Breakdown:
+| Environmental Condition / Test Category | Sample Count ($N$) | Accuracy (%) | Recall / Specificity (%) |
+|---|:---:|:---:|:---:|
+| **Dense Smoke Haze Fire** | 300 | **98.00%** | Recall: **98.0%** (Smoke feature pyramid excels) |
+| **Original Clean Fire** | 755 | **97.88%** | Recall: **97.9%** (High flame contrast) |
+| **Motion Blur & Alarm Noise Fire** | 200 | **96.50%** | Recall: **96.5%** (Resistant to vibration blur) |
+| **Low-Light / Night Fire** | 300 | **93.67%** | Recall: **93.7%** (Luminance drops affect faint smoke) |
+| **Sunset / Warm Light Distractor (Safe)** | 200 | **93.50%** | Specificity: **93.5%** (Rejects amber/red lighting) |
+| **Night Safe Room** | 150 | **92.00%** | Specificity: **92.0%** (Suppresses dark shadows) |
+| **Original Clean Safe Room** | 244 | **91.39%** | Specificity: **91.4%** (Standard baseline) |
+| **Steam / Fog Safe Room** | 100 | **88.00%** | Specificity: **88.0%** (12% steam false triggers mitigated by sensor fusion) |
+
+#### Visual Analytics: Multi-Panel Confusion Matrices & Environmental Degradation Charts
+![Confusion Matrices All](static/charts/confusion_matrices_all.png)
+*Figure 3: Three-panel confusion matrix comparison: A) Sensor Random Forest ($N=12,526$), B) YOLOv8n Clean Benchmark ($N=999$), and C) YOLOv8n Expanded Stress Benchmark ($N=2,249$).*
+
+![Environmental Stress Breakdown](static/charts/environmental_stress_breakdown.png)
+*Figure 4: Vision model accuracy and retention rate across 8 real-world environmental stress conditions.*
+
+> 💡 **Key Engineering Insight for Viva:** Notice that Steam/Fog produces an $88\%$ visual specificity (12% false alarms) because dense steam visually resembles gray smoke. **This proves the necessity of the AFAS Multimodal Fusion Layer:** in SC-2, when steam is present, the sensor model verifies that temperature is normal ($< 35^\circ\text{C}$) and TVOC is low, successfully suppressing the alert and preventing false building evacuations!
 
 ---
 
@@ -257,6 +309,10 @@ Six diverse edge-case scenarios evaluated end-to-end through the pipeline:
 | **SC-4** | **Flash Flame** (Smoke hasn't reached sensor) | $23^\circ\text{C}$, 100 ppb TVOC | $0.94$ | **$0.940$** | High | `True` | Strobe + Audio + Wheelchair Ramp Route |
 | **SC-5** | **Concurring Fire** (Both camera & sensor alert) | $78^\circ\text{C}$, 4500 ppb TVOC | $0.98$ | **$0.980$** | High | `True` | Auditory Beacons + Bed Shaker (Blind profile) |
 | **SC-6** | **Nighttime Dark** (FLIR Thermal Mode) | $55^\circ\text{C}$, 2200 ppb TVOC | $0.99$ | **$0.990$** | High | `True` | Directional Strobes + Voice (Cognitive) |
+
+#### Visual Analytics: 2D Decision Contour Surface
+![Multimodal Fusion Decision Surface](static/charts/multimodal_fusion_surface.png)
+*Figure 5: Contour mapping of camera vs sensor probabilities showing calibrated decision zones and scenario placements.*
 
 ---
 
@@ -273,6 +329,10 @@ Using NetworkX topological graph modeling:
 * **Shortest Path Output:**
   $$\text{Room 101} \longrightarrow \text{Corridor A} \longrightarrow \text{Corridor B} \longrightarrow \text{Accessible Exit}$$
 * **Stairwell Bypass Status:** **100% Success** — suppresses stairwell hazards for wheelchair occupants.
+
+#### Visual Analytics: Topological Egress Floor Plan Graph
+![Accessible Routing Graph](static/charts/accessible_routing_graph.png)
+*Figure 6: Topological graph pathfinding showing dynamic stairwell pruning and accessible ramp routing via Dijkstra's algorithm.*
 
 ---
 
